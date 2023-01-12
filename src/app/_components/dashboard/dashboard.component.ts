@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Hero } from '@app/_models';
 import { HeroService } from '@app/_services';
 
@@ -8,16 +9,38 @@ import { HeroService } from '@app/_services';
   styleUrls: ['./dashboard.component.css']
 })
 export class DashboardComponent implements OnInit {
+  
   heroes: Hero[] = [];
+  heroForm!: FormGroup;
+  // A Definite Assignment Assertion (!) megmondja a TypeScriptnek, hogy
+  // ennek a változónak futás közben is lesz értéke.
 
-  constructor(private heroService: HeroService) { }
+  constructor(private heroService: HeroService,
+              private fb: FormBuilder) { }
 
   ngOnInit(): void {
     this.getHeroes();
+    this.createHeroForm();
   }
 
   getHeroes(): void {
-    this.heroService.getHeroes()
-      .subscribe(heroes => this.heroes = heroes.slice(1, 5));
+    this.heroService.getAllHeroes()
+      .subscribe(data => this.heroes = data);
+  }
+
+  createHeroForm() {
+    this.heroForm = this.fb.group({
+      heroName: ['', Validators.required]
+    });
+  }
+
+  onSubmit() {
+    let obj: Hero = {
+      name: this.heroForm.value.heroName
+    };
+    this.heroService.addHero(obj).subscribe(() => {
+      this.getHeroes();
+    });
+    this.heroForm.reset();
   }
 }
