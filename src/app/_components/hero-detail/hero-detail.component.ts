@@ -11,7 +11,7 @@ import { HeroService } from '@app/_services';
 })
 export class HeroDetailComponent implements OnInit {
 
-  hero: Hero | undefined;
+  hero!: Hero;
 
   constructor(
     private route: ActivatedRoute,
@@ -29,6 +29,20 @@ export class HeroDetailComponent implements OnInit {
       console.log(hero);
       this.hero = hero;
     });
+  }
+
+  save(): void {
+    this.heroService.updateHero(this.hero).subscribe(
+      () => this.goBack()
+    );
+  }
+
+  delete(): void {
+    const id = Number(this.route.snapshot.paramMap.get('id'));
+    confirm("Are you sure you want to delete this hero?")
+    ? this.heroService.deleteHero(id).subscribe(
+      () => this.goBack())
+    : "";
   }
 
   goBack(): void {
